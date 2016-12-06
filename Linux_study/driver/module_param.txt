@@ -1,0 +1,3 @@
+module_param(howmany, int, S_IRUGO);	//howmany:var name     int:type     S_IRUGO:permission
+
+use insmod tst.ko howmay="kkk" to load module

@@ -1,0 +1,89 @@
+Linux驱动（多文件）的Makefile实现 
+
+
+方式1常用于编写，调试阶段。驱动源码的文件夹位置独立自由，只要在Makefile中指定好Linux内核源码的路径。
+
+方式2常用于最后集成阶段，在调试基本完成后，可以将驱动源代码文件（夹）放置在Linux内核源码的driver/xxx/的相应路径中，修改本层和上层的Makefile和KConfig文件，并重新make menuconfig内核，可以在Menu中选中新加入的驱动模块，然后make module，就可以在驱动源码文件夹生成.ko文件。
+
+ 
+
+方式1：
+
+ 本地Makefile文件内容如下：
+
+
+ifeq ($(KERNELRELEASE),)           #开始满足这个条件  
+KERNELDIR ?= /opt/xxxxxx/linux-2.6.32.2    #指定Linux内核目录位置  
+PWD := $(shell pwd)    #打印当前驱动源码的本地位置  
+modules:               #编译为驱动模块  
+    $(MAKE) -C $(KERNELDIR) M=$(PWD) modules  
+#-C 指定内核Makefile的路径，可以使用相对路径。  
+#-M 指定要编译的文件的路径，同样可以使用相对路径。  
+modules_install:  
+    $(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install  
+clean:  
+    rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions modules.order Module.symvers  
+  
+.PHONY: modules modules_install clean  
+  
+else   #再次读取这个Makefile文件时，下面的执行  
+MODULE_NAME := ecat    #指定驱动模块的名字  
+# 注意：驱动模块的名字 千万 不能和本文件夹内的任何文件同名！  
+RESMAIN_CORE_OBJS := ecat2440.o    #指定驱动模块的核心文件（有init 和 exit）  
+RESMAIN_GLUE_OBJS := ecateoe.o eoeappl.o mcihw.o ecatslv.o mailbox.o ecatappl.o #依赖文件  
+$(MODULE_NAME)-objs := $(RESMAIN_GLUE_OBJS) $(RESMAIN_CORE_OBJS)   
+#xxx-objs := 指定驱动模块的所有依赖文件  
+obj-m := ecat.o   #最终由xxx-objs链接生成ecat.o，再生成ecat.ko  
+endif  
+# change by myself for test   
+
+ 
+
+方式2：
+
+ 
+
+1. 本地Makefile
+
+
+#CONFIG_ECAT_DRV为m时编译为模块，为y时编进内核  
+obj-$(CONFIG_ECAT_DRV) += ecat.o  
+#-objs指定依赖的多个.o文件  
+ecat-objs := ecateoe.o eoeappl.o mcihw.o ecatslv.o mailbox.o ecatappl.o ecat2440.o  
+
+ 
+
+2. 本地Kconfig
+
+
+#建立一个本地子目录。“”为显示的目录名字  
+menu "ecat driver here"       
+    depends on NET  #依赖于上层的某个开关  
+config ECAT_DRV  #配置变量名，必须和Makefile中的变量后半段一样   
+    bool "ecat driver" #bool量， 显示的名字  
+    ---help---  #下面为要显示的帮助文字  
+        This is test for ecat.  
+endmenu  #本地子目录结束  
+
+ 
+
+3. 上层Makefile
+
+
+*  
+*#添加下面这一句  
+obj-$(CONFIG_ECAT_DRV) += ecat/  #打开下一级目录编译  
+*  
+*  
+
+ 
+
+4. 上层Kconfig
+
+
+*  
+*#添加下面这一句  
+source "driver/xxx/ecat/Kconfig"  
+#导入子文件夹中的Kconfig文件，可以为相对路径  
+*  
+*  

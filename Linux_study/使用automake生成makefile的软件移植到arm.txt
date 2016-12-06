@@ -1,0 +1,6 @@
+把使用automake生成makefile的软件移植到arm平台上，设置CC编译器可以简单用以下命令
+
+export CROSS_COMPILE=arm-linux
+export CC=${CROSS_COMPILE}-gcc
+./configure
+make

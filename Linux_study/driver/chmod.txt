@@ -1,0 +1,8 @@
+chmod [ugoa][+-wrx] file
+u owner
+g grounp
+o other
+a all
+
+example:
+chmod g-x test

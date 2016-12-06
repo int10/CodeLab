@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Malware.exe</file>
+    </qresource>
+</RCC>

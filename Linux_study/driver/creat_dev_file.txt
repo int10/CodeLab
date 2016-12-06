@@ -1,0 +1,7 @@
+testdrv_class = class_create(THIS_MODULE, "scull");			//will creat a vitual class file in /sys/class/
+testdrv_class_dev = device_create(testdrv_class, NULL, MKDEV(scull_major, 0), NULL, "scull0");	//will creat dev file in /dev
+
+device_destroy(testdrv_class, MKDEV(scull_major, 0)); 
+class_destroy(testdrv_class);
+
+detail can refer to scull src

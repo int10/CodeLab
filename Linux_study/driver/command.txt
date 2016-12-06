@@ -1,0 +1,11 @@
+insmod tst.ko		//load module
+dmesg | tail¡¡¡¡¡¡	//debug message
+sudo dmesg -c		//clean debug message
+lsmod | grep tst	//list loaded modules
+rmmod tst.ko		//unload module
+cat /proc/devices	//check driver major
+
+sudo mknod /dev/scull0 c 251 0		//make a dev node ...had better use chmod to give other user permission to read/write,otherwise,you can get open sucess message at user mode,but in fact , it's not open in kernel mode..
+
+cat /proc/kallsyms	//check exported symbol
+

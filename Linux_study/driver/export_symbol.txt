@@ -1,0 +1,13 @@
+1,在模块A中导出要用的符号：
+	int a(int a,int b)
+	EXPORT_SYMBOL(a);
+2,编译A，得到Module.symvers。。此文件是导出符号的文件。。
+3，在模块B中使用导出的符号：
+	extern int a(int a,int b)
+	a(3,5);
+4,从模式A中拷贝Module.symvers到模式B的文件夹中，覆盖原来文件，编译，测试。
+
+
+如果不想做第2步。。可以在模块B的Makefile加上这句：
+KBUILD_EXTRA_SYMBOLS=~/Driver/hello/Module.symvers
+后面为模块A的module.symvers的位置
